@@ -67,4 +67,56 @@ See the PDF documentation
 	</filter-mapping>
 	
     
+-----------------------------------
+3.	Change the login page
+
+You can create your own login page, or modify the Bonitasoft page.
+Note: if you change the Bonitasoft page, you should apply the change after each Bonita Upgrade.
+In the login Page, add just BEFORE the </head> balise (you have to place here your KEY)
+<meta name="google-signin-client_id" content="HERE_THE_CLIENT_KEY">
+<script src="https://apis.google.com/js/platform.js" async defer></script> 
+<script>
+function onSignIn(googleUser) {
+  var form = $('#LoginForm');
+  var actionUrlElement = form.attr('action');
+  var profile = googleUser.getBasicProfile();
+  console.log('ID              : ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+  console.log('Name            : ' + profile.getName());
+  console.log('Image URL       : ' + profile.getImageUrl());
+  console.log('Email           : ' + profile.getEmail());
+  console.log('actionUrlElement: ' + actionUrlElement);
+  var id_token = googleUser.getAuthResponse().id_token;
+  console.log("ID Token: " + id_token);
+	
+  /*  .get('../bonita/portal/homepage?idtokengoogle='+id_token,function(data,status) { alert("get it"); }) */
+  var dataLogin={}
+  dataLogin.idtokengoogle = googleUser.getAuthResponse().id_token;
+  dataLogin.namegoogle=profile.getName();
+  if (actionUrlElement == null)
+  {
+	
+	$.post("../bonita/portal/homepage", dataLogin, function(result){
+		window.location.replace('../bonita');
+	});
+   }
+  else {
+	redirectUrl="../bonita";
+	var redirectUrlPos = actionUrlElement.indexOf("redirectUrl=");
+	if (redirectUrlPos!=-1)
+	{
+		redirectUrl = actionUrlElement.substring(redirectUrlPos+"redirectUrl=".length );
+		// string is like /bonita/portal.... so the final should be ../bonita 
+		redirectUrl = ".."+decodeURIComponent( redirectUrl );
+	}
+		
+	$.post(actionUrlElement, dataLogin, function(result){
+		window.location.replace(redirectUrl);
+	} );
+	}
+  
+}
+</script>
+And then in the page, add 
+	<div class="g-signin2" data-onsuccess="onSignIn"></div>
+For example, we add it just after the Login button
 
