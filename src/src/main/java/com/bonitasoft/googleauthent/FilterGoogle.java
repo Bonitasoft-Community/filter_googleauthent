@@ -141,6 +141,7 @@ public class FilterGoogle implements Filter {
         final HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
 
+
         if (isLog)
         {
             synchronized (CounterReqId) {
@@ -152,6 +153,7 @@ public class FilterGoogle implements Filter {
         String traceRequest = "filterGoogle " + versionFilter;
         try
         {
+
             final String url = httpRequest.getRequestURL().toString();
 
             traceRequest += "#" + reqId + " [" + url + "]";
